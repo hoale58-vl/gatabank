@@ -55,11 +55,11 @@ void mainDelegate() async {
 
     await storage.init();
 
-    runApp(
+    runApp(Lo
       EasyLocalization(
-          supportedLocales: [Locale('en', 'US'), Locale('id', 'ID')],
+          supportedLocales: [Locale('vi', 'VN')],
           path: 'locales',
-          fallbackLocale: Locale('en', 'US'),
+          fallbackLocale: Locale('vi', 'VN'),
           assetLoader: CodegenLoader(),
           child: ChangeNotifierProvider(
             create: (_) => ThemeProvider(),

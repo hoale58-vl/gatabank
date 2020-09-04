@@ -21,23 +21,23 @@ class _OnboardingState extends State<OnboardingScreen> {
     _swipeController = SwiperController();
     _initialList();
     _images = List<Image>.generate(titles.length,
-            (i) => Image(image: AssetImage('assets/onboarding_${i + 1}${App.theme.suffix}.png')));
+            (i) => Image(image: AssetImage('assets/onboarding_${i + 1}${App.theme.suffix}.webp')));
     super.initState();
   }
 
   _initialList() {
     titles = [
-      LocaleKeys.onboarding_hello_welcome_to_toko_w.tr(),
-      LocaleKeys.onboarding_all_assets_in_one_place.tr(),
-      LocaleKeys.onboarding_private_and_secure.tr(),
-      LocaleKeys.onboarding_experience_blockchain_technology.tr()
+      LocaleKeys.onboarding_title1.tr(),
+      LocaleKeys.onboarding_title2.tr(),
+      LocaleKeys.onboarding_title3.tr(),
+      LocaleKeys.onboarding_title4.tr()
     ];
 
     descriptions = [
-      LocaleKeys.onboarding_experience_a_trading_platform_powered_by_tokoin.tr(),
-      LocaleKeys.onboarding_store_and_manage_your_assets.tr(),
-      LocaleKeys.onboarding_trade_your_assets_anonymously.tr(),
-      LocaleKeys.onboarding_earn_trade_explore_utilize_tokoin.tr()
+      LocaleKeys.onboarding_content1.tr(),
+      LocaleKeys.onboarding_content2.tr(),
+      LocaleKeys.onboarding_content3.tr(),
+      LocaleKeys.onboarding_content4.tr()
     ];
   }
 
