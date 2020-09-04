@@ -55,7 +55,7 @@ void mainDelegate() async {
 
     await storage.init();
 
-    runApp(Lo
+    runApp(
       EasyLocalization(
           supportedLocales: [Locale('vi', 'VN')],
           path: 'locales',
