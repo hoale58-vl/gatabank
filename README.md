@@ -1,6 +1,6 @@
 # gatabank
 
-Gatabank app
+Gatabank application
 
 ## Getting Started
 
