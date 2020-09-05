@@ -34,7 +34,11 @@ class _LoginScreenState extends State<LoginScreen> {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              App.theme.getSvgPicture('logo', height: 185),
+              Image.asset(
+                "assets/logo.png",
+                width: 185,
+                height: 185,
+              ),
               SizedBox(
                 height: 50,
               ),
