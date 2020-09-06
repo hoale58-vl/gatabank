@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/repositories/user.dart';
+import 'package:gatabank/screen_router.dart';
 import 'package:gatabank/screens/auth/fcm_bloc.dart';
 import 'package:gatabank/screens/home/home.dart';
 import 'package:gatabank/screens/login/login.dart';
@@ -21,6 +23,25 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
+
+  @override
+  void initState() {
+    _setupFirstTimeLaunchApp();
+    super.initState();
+  }
+
+  _setupFirstTimeLaunchApp() async {
+    bool isFirstTimeLaunchApp = storage.isOnboardingEnabled();
+    if (!isFirstTimeLaunchApp) return;
+    _goToOnBoarding();
+  }
+
+  Future _goToOnBoarding() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pushNamed(context, ScreenRouter.ONBOARDING);
+    });
+    storage.disableOnboarding();
+  }
 
   @override
   Widget build(BuildContext context) {

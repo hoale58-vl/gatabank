@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screens/auth/auth_bloc.dart';
+import 'package:gatabank/screens/onboarding/onboarding.dart';
 import 'package:gatabank/screens/root.dart';
 import 'package:gatabank/widgets/button_widget.dart';
 
 class ScreenRouter {
   static const ROOT = '/';
+  static const ONBOARDING = 'onboarding';
   UserRepository userRepos;
   AuthBloc authBloc;
 
@@ -14,14 +16,17 @@ class ScreenRouter {
         this.authBloc});
 
   Route<dynamic> generateRoute(RouteSettings settings) {
-    Map arguments = settings.arguments;
-
     switch (settings.name) {
       case ROOT:
         return MaterialPageRoute(
           builder: (context) => Root(
             userRepository: userRepos
           ),
+          settings: settings,
+        );
+      case ONBOARDING:
+        return MaterialPageRoute(
+          builder: (context) => OnboardingScreen(),
           settings: settings,
         );
       default:

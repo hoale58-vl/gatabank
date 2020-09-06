@@ -94,6 +94,14 @@ class Storage {
   Future<void> deleteSecureData(String key) async {
     await securedStorage.delete(key: key);
   }
+
+  bool isOnboardingEnabled() {
+    return _prefs.getBool(SHOULD_SHOW_ONBOARDING) ?? true;
+  }
+
+  disableOnboarding() {
+    _prefs.setBool(SHOULD_SHOW_ONBOARDING, false);
+  }
 }
 
 final storage = Storage();
