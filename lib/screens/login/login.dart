@@ -18,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _phone;
-
+  String _otp;
   LoginBloc _loginBloc;
 
   @override
@@ -32,59 +32,58 @@ class _LoginScreenState extends State<LoginScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: <Widget>[
-              Image.asset(
-                "assets/logo.png",
-                width: 185,
-                height: 185,
-              ),
-              SizedBox(
-                height: 50,
-              ),
-              InputWidget(
-                title: "Số điện thoại (+84)",
-                onSaved: (value) => _phone = value,
-                validator: PhoneValidator.validate,
-              ),
-              SizedBox(
-                height: 15,
-              ),
-              _buildBottom(),
-              SizedBox(
-                height: 20,
-              ),
-              (state == LoginLoading())
-                  ? CircularProgressIndicator()
-                  : ButtonWidget(
-                key: Key('BtnLogin'),
-                onPressed: _handleLogin,
-                title: "Đăng nhập",
-              ),
-              SizedBox(
-                height: 20,
-              ),
-            ],
-          ),
+          child: state is LoginSendingOtp? _buildOtpForm(state) : _buildPhoneForm(state)
         ),
       ),
     );
   }
 
-  Widget _buildBottom() {
-    return Align(
-      alignment: Alignment.center,
-      child: InkWell(
-        child: RichText(
-          text: TextSpan(
-            text: "Khi đăng nhập, bạn đã đồng ý với ",
-            style: App.theme.styles.body2.copyWith(color: App.theme.colors.text1),
-            children: <TextSpan>[
-              TextSpan(
-                  text: "Điều khoản dịch vụ ",
-                  style: App.theme.styles.button2.copyWith(color: App.theme.colors.primary),
-                  children: <TextSpan>[
-                    TextSpan(
+  Widget _buildPhoneForm(LoginState state){
+    return Column(
+      children: <Widget>[
+        Image.asset(
+          "assets/logo.png",
+          width: 185,
+          height: 185,
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: InkWell(
+            child: RichText(
+              text: TextSpan(
+                text: "Việt Nam (+84)",
+                style: App.theme.styles.body2.copyWith(color: App.theme.colors.text1),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        InputWidget(
+          title: "Số điện thoại",
+          onSaved: (value) => _phone = value,
+          validator: PhoneValidator.validate,
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: InkWell(
+            child: RichText(
+              text: TextSpan(
+                text: "Khi đăng nhập, bạn đã đồng ý với ",
+                style: App.theme.styles.body2.copyWith(color: App.theme.colors.text1),
+                children: <TextSpan>[
+                  TextSpan(
+                    text: "Điều khoản dịch vụ ",
+                    style: App.theme.styles.button2.copyWith(color: App.theme.colors.primary),
+                    children: <TextSpan>[
+                      TextSpan(
                         text: "và ",
                         style: App.theme.styles.body2.copyWith(color: App.theme.colors.text1),
                         children: <TextSpan>[
@@ -93,13 +92,94 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: App.theme.styles.button2.copyWith(color: App.theme.colors.primary)
                           ),
                         ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+        SizedBox(
+          height: 20,
+        ),
+        (state == LoginLoading())
+            ? CircularProgressIndicator()
+            : ButtonWidget(
+          key: Key('BtnSendOtp'),
+          onPressed: _handleSendOtp,
+          title: "Đăng nhập",
+        ),
+        SizedBox(
+          height: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtpForm(LoginSendingOtp state) {
+    return Column(
+      children: <Widget>[
+        Image.asset(
+          "assets/logo.png",
+          width: 185,
+          height: 185,
+        ),
+        SizedBox(
+          height: 50,
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: InkWell(
+            child: RichText(
+              text: TextSpan(
+                text: "Bạn vui lòng nhập mã OTP vừa gửi qua số điện thoại ${state.phone}",
+                style: App.theme.styles.body2.copyWith(color: App.theme.colors.text1),
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        InputWidget(
+            title: "Mã OTP",
+            onSaved: (value) => _otp = value,
+            initialValue: "",
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'Vui lòng nhập mã OTP';
+              }
+              return null;
+            }
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        (state == LoginLoading())
+            ? CircularProgressIndicator()
+            : ButtonWidget(
+          key: Key('BtnLogin'),
+          onPressed: _handleLogin,
+          title: "Xác nhận",
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        (state == LoginLoading())
+            ? CircularProgressIndicator()
+            : ButtonWidget(
+          key: Key('BtnResend'),
+          onPressed: _handleSendOtp,
+          title: "Gửi lại OTP",
+        ),
+        SizedBox(
+          height: 20,
+        ),
+      ],
     );
   }
 
@@ -150,9 +230,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_validateAndSave()) {
-      _loginBloc.add(LoginButtonPressed(
-        phone: _phone
+      _loginBloc.add(OtpButtonPressed(
+        phone: _phone,
+        otp: _otp
       ));
     }
+  }
+
+  void _handleSendOtp() {
+    _loginBloc.add(LoginButtonPressed(
+        phone: _phone
+    ));
   }
 }

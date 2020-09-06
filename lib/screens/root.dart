@@ -49,6 +49,7 @@ class _RootState extends State<Root> {
             create: (context) {
               return LoginBloc(
                 userRepository: widget.userRepository,
+                authBloc: BlocProvider.of<AuthBloc>(context),
               );
             },
             child: LoginScreen(),

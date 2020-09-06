@@ -63,15 +63,35 @@ class API  {
   }
 
   Future<Response> sendOTP(String phone) async {
+    return Response(
+      statusCode: 200
+    );
     return await _dio.post('/otp/send', data: {
       "phone": phone
     });
   }
 
+  Future<Response> verifyOtp(String phone, String otp) async {
+    return Response(
+      data: {
+        "id": 1,
+        "full_name": "Lvhoa",
+        "phone": phone
+      },
+      statusCode: 200
+    );
+    return await _dio.post('/otp/verify', data: {
+      "phone": phone,
+      "otp": otp
+    });
+  }
+
+
   Future<Response> addFcmToken(String token, String fcmToken) async {
     _dio.options.headers['Authorization'] = 'Bearer ' + token;
     return await _dio.post("/device/add", data: {"Token": fcmToken});
   }
+
 }
 
 final api = new API();

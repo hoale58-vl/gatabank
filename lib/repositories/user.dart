@@ -12,10 +12,17 @@ class UserRepository {
     @required this.api,
   })  : assert(api != null);
 
-  Future<String> sendOTP({String phone}) async {
+  Future<bool> sendOTP({String phone}) async {
     var response = await api.sendOTP(phone);
-    Map<String, dynamic> map = response.data;
-    return map['Result']['firebase_sid'];
+    return response.statusCode == 200;
+  }
+
+  Future<User> verifyOtp({String phone, String otp}) async {
+    var response = await api.verifyOtp(phone, otp);
+    if (response.statusCode == 200){
+      return User.fromJson(response.data);
+    }
+    return null;
   }
 
   User currentUser() {
@@ -32,4 +39,5 @@ class UserRepository {
     var response = await api.addFcmToken(await storage.getSecureData(CONST.JWT_TOKEN), fcmToken);
     return response.statusCode != HttpStatus.ok;
   }
+
 }
