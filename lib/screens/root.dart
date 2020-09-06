@@ -8,6 +8,8 @@ import 'package:gatabank/screens/auth/fcm_bloc.dart';
 import 'package:gatabank/screens/home/home.dart';
 import 'package:gatabank/screens/login/login.dart';
 import 'package:gatabank/screens/login/login_bloc.dart';
+import 'package:gatabank/screens/userinfo/userinfo.dart';
+import 'package:gatabank/screens/userinfo/userinfo_bloc.dart';
 
 import 'auth/auth_bloc.dart';
 import 'auth/auth_states.dart';
@@ -48,21 +50,39 @@ class _RootState extends State<Root> {
     return BlocBuilder<AuthBloc, AuthenticationState>(
       builder: (context, state) {
         if (state is AuthenticationAuthenticated) {
-          return MultiBlocProvider(
-            providers: [
-              BlocProvider<HomeBloc>(
-                create: (context) {
-                  return HomeBloc(
-                    userRepository: widget.userRepository,
-                  );
-                },
-              ),
-              BlocProvider<FcmBloc>(create: (context) {
-                return FcmBloc(userRepository: widget.userRepository);
-              }),
-            ],
-            child: HomeScreen(),
-          );
+          if (state.user.updatedInfo()){
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider<HomeBloc>(
+                  create: (context) {
+                    return HomeBloc(
+                      userRepository: widget.userRepository,
+                    );
+                  },
+                ),
+                BlocProvider<FcmBloc>(create: (context) {
+                  return FcmBloc(userRepository: widget.userRepository);
+                }),
+              ],
+              child: HomeScreen(),
+            );
+          } else {
+            return MultiBlocProvider(
+              providers: [
+                BlocProvider<UserInfoBloc>(
+                  create: (context) {
+                    return UserInfoBloc(
+                      userRepository: widget.userRepository,
+                    );
+                  },
+                ),
+                BlocProvider<FcmBloc>(create: (context) {
+                  return FcmBloc(userRepository: widget.userRepository);
+                }),
+              ],
+              child: UserInfoScreen(),
+            );
+          }
         }
 
         if (state is AuthenticationUnauthenticated) {

@@ -154,10 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
             }
         ),
         SizedBox(
-          height: 15,
-        ),
-        SizedBox(
-          height: 20,
+          height: 35,
         ),
         (state == LoginLoading())
             ? CircularProgressIndicator()
