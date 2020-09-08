@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
 class User {
-  int id;
+  String id;
   String fullName;
   String phone;
   int income;
@@ -39,7 +39,7 @@ class User {
   get fullPhoneNumber => '+84$phone';
 
   User.fromJson(Map<String, dynamic> map) {
-    id = map['id'] as int;
+    id = map['id'] as String;
     fullName = map['full_name'] as String;
     phone = map['phone'] as String;
     income = map['income'] as int;

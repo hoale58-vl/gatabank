@@ -12,9 +12,7 @@ class AuthenticationUninitialized extends AuthenticationState {
 
 class AuthenticationAuthenticated extends AuthenticationState {
   final User user;
-
   AuthenticationAuthenticated({@required this.user});
-
   @override
   String toString() => 'AuthenticationAuthenticated $user';
 }

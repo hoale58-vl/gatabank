@@ -11,9 +11,7 @@ class FcmUninitialized extends FcmState {
 
 class FcmTransactionConfirmed extends FcmState {
   final int transactionId;
-
   FcmTransactionConfirmed({@required this.transactionId});
-
   @override
   String toString() => 'FcmTransactionConfirmed $transactionId';
 }

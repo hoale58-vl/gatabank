@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gatabank/repositories/user.dart';
-import 'package:gatabank/screens/auth/auth_bloc.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/screens/onboarding/onboarding.dart';
 import 'package:gatabank/screens/root.dart';
 import 'package:gatabank/widgets/button_widget.dart';
@@ -9,11 +9,11 @@ class ScreenRouter {
   static const ROOT = '/';
   static const ONBOARDING = 'onboarding';
   UserRepository userRepos;
-  AuthBloc authBloc;
+  AuthCubit authCubit;
 
   ScreenRouter(
       {this.userRepos,
-        this.authBloc});
+        this.authCubit});
 
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

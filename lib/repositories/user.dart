@@ -40,4 +40,20 @@ class UserRepository {
     return response.statusCode != HttpStatus.ok;
   }
 
+  Future<User> updateInfo({
+    @required int income,
+    @required int loanExpected,
+    @required int loanTerm,
+    @required String address,
+    @required String salaryReceiveMethod
+  }) async {
+    User user = currentUser();
+    user.income = income;
+    user.loanExpected = loanExpected;
+    user.loanTerm = loanTerm;
+    user.address = address;
+    user.salaryReceiveMethod = salaryReceiveMethod;
+    var response = await api.updateInfo(user.id, user.toJson());
+    return response.statusCode == 200 ? user : null;
+  }
 }

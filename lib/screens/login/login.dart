@@ -6,8 +6,7 @@ import 'package:gatabank/widgets/button_widget.dart';
 import 'package:gatabank/widgets/input_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'login_bloc.dart';
-import 'login_events.dart';
+import 'login_cubit.dart';
 import 'login_states.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _phone;
   String _otp;
-  LoginBloc _loginBloc;
+  LoginCubit _loginCubit;
 
   @override
   void initState() {
@@ -66,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
         InputWidget(
           title: "Số điện thoại",
           onSaved: (value) => _phone = value,
-          validator: PhoneValidator.validate,
+          validator: (value) => PhoneValidator.validate(value),
         ),
         SizedBox(
           height: 15,
@@ -182,9 +181,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _loginBloc = BlocProvider.of<LoginBloc>(context);
+    _loginCubit = BlocProvider.of<LoginCubit>(context);
 
-    return BlocListener<LoginBloc, LoginState>(
+    return BlocListener<LoginCubit, LoginState>(
       listener: (context, state) {
         if (state is LoginFailure) {
           Fluttertoast.showToast(
@@ -197,8 +196,8 @@ class _LoginScreenState extends State<LoginScreen> {
               fontSize: 15.0);
         }
       },
-      child: BlocBuilder<LoginBloc, LoginState>(
-        bloc: _loginBloc,
+      child: BlocBuilder<LoginCubit, LoginState>(
+        cubit: _loginCubit,
         builder: (context, state) {
           if (state is LoginSuccess) {
             return Scaffold();
@@ -227,16 +226,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() {
     if (_validateAndSave()) {
-      _loginBloc.add(OtpButtonPressed(
-        phone: _phone,
-        otp: _otp
-      ));
+      _loginCubit.login(
+        _phone,
+        _otp
+      );
     }
   }
 
   void _handleSendOtp() {
-    _loginBloc.add(LoginButtonPressed(
-        phone: _phone
-    ));
+    if (_validateAndSave()) {
+      _loginCubit.sendOtp(
+          _phone
+      );
+    }
   }
 }

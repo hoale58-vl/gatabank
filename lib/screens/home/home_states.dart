@@ -21,7 +21,3 @@ class HomeActiveTab extends HomeState {
   String toString() => 'HomeActiveTab $index';
 }
 
-class HomeCreated extends HomeState {
-  @override
-  String toString() => 'HomeCreated';
-}

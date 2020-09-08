@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/config.dart';
-import 'package:gatabank/screens/auth/auth_bloc.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/theme/theme_provider.dart';
 import 'package:gatabank/theme/themes.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,7 @@ class Routes extends StatelessWidget {
   Widget build(BuildContext context) {
     var screenRouter = ScreenRouter(
       userRepos: userRepos,
-      authBloc: BlocProvider.of<AuthBloc>(context),
+      authCubit: BlocProvider.of<AuthCubit>(context),
     );
     final Themes theme = Provider.of<ThemeProvider>(context).getTheme(context);
     App.theme = theme;

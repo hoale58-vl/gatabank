@@ -74,7 +74,7 @@ class API  {
   Future<Response> verifyOtp(String phone, String otp) async {
     return Response(
       data: {
-        "id": 1,
+        "id": "1",
         "full_name": "Lvhoa",
         "phone": phone
       },
@@ -86,12 +86,17 @@ class API  {
     });
   }
 
-
   Future<Response> addFcmToken(String token, String fcmToken) async {
     _dio.options.headers['Authorization'] = 'Bearer ' + token;
     return await _dio.post("/device/add", data: {"Token": fcmToken});
   }
 
+  Future<Response> updateInfo(String userId, Map<String, dynamic> json) async {
+    return Response (
+      statusCode: 200
+    );
+    return await _dio.put('/user/$userId', data: json);
+  }
 }
 
 final api = new API();

@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:gatabank/models/user.dart';
+
 abstract class UserInfoState  {
   UserInfoState() : super();
 }
@@ -12,7 +15,12 @@ class UserInfoLoading extends UserInfoState {
   String toString() => 'UserInfoLoading';
 }
 
-class UserInfoCreated extends UserInfoState {
+class UpdateUserFailure extends UserInfoState {
   @override
-  String toString() => 'UserInfoCreated';
+  String toString() => 'UpdateUserFailure';
+}
+
+class UpdateUserSuccess extends UserInfoState {
+  @override
+  String toString() => 'UpdateUserSuccess';
 }

@@ -12,7 +12,6 @@ class LoginInitial extends LoginState {
 class LoginSendingOtp extends LoginState {
   String phone;
   LoginSendingOtp({@required this.phone}) : super();
-
   @override
   String toString() => 'LoginSendingOtp';
 }

@@ -6,16 +6,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/api.dart';
 import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/repositories/user.dart';
-import 'package:gatabank/screens/auth/auth_bloc.dart';
-import 'package:gatabank/screens/auth/auth_events.dart';
-import 'package:gatabank/screens/auth/fcm_bloc.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
+import 'package:gatabank/screens/auth/fcm_cubit.dart';
 import 'package:gatabank/theme/theme_provider.dart';
 import 'package:gatabank/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:gatabank/routes.dart';
-import 'package:provider/provider.dart';
 
-class SimpleBlocDelegate extends BlocDelegate {
+class SimpleBlocObserver extends BlocObserver {
   @override
   void onEvent(Bloc bloc, Object event) {
     super.onEvent(bloc, event);
@@ -27,8 +25,8 @@ class SimpleBlocDelegate extends BlocDelegate {
   }
 
   @override
-  void onError(Bloc bloc, Object error, StackTrace stacktrace) {
-    super.onError(bloc, error, stacktrace);
+  void onError(Cubit cubit, Object error, StackTrace stacktrace) {
+    super.onError(cubit, error, stacktrace);
     utils.errorToast(error.toString());
   }
 }
@@ -37,23 +35,22 @@ void mainDelegate() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runZoned(() async {
-    BlocSupervisor.delegate = SimpleBlocDelegate();
+    Bloc.observer = SimpleBlocObserver();
     var userRepos = UserRepository(api: api);
-
     await storage.init();
 
     runApp(
       ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
-        child: BlocProvider<AuthBloc>(
+        child: BlocProvider<AuthCubit>(
           create: (context) {
             var authBloc =
-            AuthBloc(userRepository: userRepos, fcmBloc: FcmBloc(userRepository: userRepos))
-              ..add(AppStarted());
+            AuthCubit(userRepository: userRepos, fcmCubit: FcmCubit(userRepository: userRepos))
+              ..checkAuthentication();
 
             api.onError((Exception error) {
               if (error is APIUnauthorizedException) {
-                authBloc.add(LoggedOut());
+                authBloc.loggedOut();
               }
             });
 

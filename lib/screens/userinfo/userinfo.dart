@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gatabank/validators/string_validator.dart';
 import 'package:gatabank/widgets/button_widget.dart';
 import 'package:gatabank/widgets/input_widget.dart';
+import 'package:gatabank/widgets/popup_widget.dart';
 import 'package:gatabank/widgets/row_item.dart';
 
 import '../../config.dart';
@@ -17,18 +19,29 @@ class UserInfoScreen extends StatefulWidget {
 }
 
 class _UserInfoState extends State<UserInfoScreen>  {
-  UserInfoBloc _userInfoBloc;
+  UserInfoCubit _userInfoCubit;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  int _income;
+  int _loanExpected;
+  int _loanTerm;
+  String _address;
+  String _salaryReceiveMethod;
 
   @override
   Widget build(BuildContext context) {
-    _userInfoBloc = BlocProvider.of<UserInfoBloc>(context);
-    return BlocListener<UserInfoBloc, UserInfoState>(
+    _userInfoCubit = BlocProvider.of<UserInfoCubit>(context);
+
+    return BlocListener<UserInfoCubit, UserInfoState>(
       listener: (context, state) {
       },
-      child: BlocBuilder<UserInfoBloc, UserInfoState>(
-        bloc: _userInfoBloc,
+      child: BlocBuilder<UserInfoCubit, UserInfoState>(
+        cubit: _userInfoCubit,
         builder: (context, state) {
+          if (state is UpdateUserSuccess) {
+            return Scaffold();
+          }
+
           return Scaffold(
             appBar: null,
             body: Container(
@@ -78,23 +91,31 @@ class _UserInfoState extends State<UserInfoScreen>  {
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Thu thập hằng\n tháng của tôi là", value: "200.000d" ?? '').getWidget(),
+        RowItem('', "Thu thập hằng\n tháng của tôi là", value: _income ?? '').getWidget(
+          onTap: () => {
+            _handleInputUserInfo(
+              title: "Thu nhập hằng tháng",
+              onSaved: (value) => _income = value != null ? int.parse(value, onError: _income = null) : null,
+              onSubmit: () => Intent.doNothing
+            )
+          }
+        ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi muốn vay", value: "50.000.000d" ?? '').getWidget(),
+        RowItem('', "Tôi muốn vay", value: _loanExpected ?? '').getWidget(),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Kì hạn vay", value: "12 tháng").getWidget(),
+        RowItem('', "Kì hạn vay", value: _loanTerm ?? '').getWidget(),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi sống ở", value: "Sài gòn").getWidget(),
+        RowItem('', "Tôi sống ở", value: _address ?? '').getWidget(),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi nhận lương bằng", value: "Tiền mặt").getWidget(),
+        RowItem('', "Tôi nhận lương bằng", value: _salaryReceiveMethod ?? '').getWidget(),
         SizedBox(
           height: 25,
         ),
@@ -172,11 +193,78 @@ class _UserInfoState extends State<UserInfoScreen>  {
     );
   }
 
-  _handleResetForm() {
+  bool _validateAndSave() {
+    final FormState form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
+  }
 
+  _handleResetForm() {
+    setState(() {
+      _income = null;
+      _loanExpected = null;
+      _loanTerm = null;
+      _address = null;
+      _salaryReceiveMethod = null;
+    });
   }
 
   _handleConfirm() {
-
+    if (_validateAndSave()) {
+      _userInfoCubit.submitData(
+          income: _income,
+          loanExpected: _loanExpected,
+          loanTerm: _loanTerm,
+          address: _address,
+          salaryReceiveMethod: _salaryReceiveMethod
+      );
+    }
   }
+
+  _handleInputUserInfo({@required String title, @required Function(String) onSaved, @required VoidCallback onSubmit}) async {
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return Container(
+            padding: EdgeInsets.only(bottom: MediaQuery
+                .of(context)
+                .viewInsets
+                .bottom),
+            child: PopupWidget(
+              icon: '',
+              title: title,
+              content: InputWidget(
+                title: title,
+                onSaved: (value) => onSaved(value),
+                validator: (value) => StringValidator.notEmpty(value),
+              ),
+              actions: <Widget>[
+                ButtonWidget(
+                  title: 'Quay lại',
+                  onPressed: () {
+                    onSaved(null);
+                    Navigator.pop(context);
+                  },
+                  buttonType: ButtonType.blue_border,
+                ),
+                SizedBox(
+                  width: 25,
+                ),
+                ButtonWidget(
+                  title: 'Xác nhận',
+                  onPressed: () {
+                    onSubmit();
+                    Navigator.pop(context);
+                  },
+                  buttonType: ButtonType.red_filled,
+                )
+              ],
+            ),
+          );
+        });
+      }
 }

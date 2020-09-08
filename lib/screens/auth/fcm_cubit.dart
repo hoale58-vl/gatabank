@@ -5,37 +5,18 @@ import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:meta/meta.dart';
 
-import 'fcm_events.dart';
 import 'fcm_states.dart';
 
-class FcmBloc extends Bloc<FcmEvent, FcmState> {
+class FcmCubit extends Cubit<FcmState> {
   final UserRepository userRepository;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
 
-  FcmBloc({@required this.userRepository}) : assert(userRepository != null);
+  FcmCubit({@required this.userRepository}) : super(FcmUninitialized());
 
-  @override
-  FcmState get initialState => FcmUninitialized();
-
-  @override
-  Stream<FcmState> mapEventToState(FcmEvent event) async* {
-    if (event is InitialFcm) {
-      _setupFcm();
-    } else if (event is AddFcm) {
-      await _firebaseMessaging.requestNotificationPermissions();
-      _firebaseMessaging.getToken().then((token) => _saveToken(token)); // save token after login
-    } else if (event is RemoveFcm) {
-      _firebaseMessaging
-          .deleteInstanceID(); // make fcm token invalid, so logged out device won't receive notification
-    } else if (event is ReceivedFcm) {
-      yield FcmTransactionConfirmed(transactionId: 1);
-    }
-  }
-
-  _setupFcm() {
+  Future<void>  setupFcm() async {
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-        add(ReceivedFcm());
+        receivedFcm();
       },
       onLaunch: (Map<String, dynamic> message) async {},
       onResume: (Map<String, dynamic> message) async {},
@@ -43,6 +24,19 @@ class FcmBloc extends Bloc<FcmEvent, FcmState> {
 
     _firebaseMessaging.onTokenRefresh
         .listen((token) => _saveToken(token)); // save token when it was refreshed
+  }
+
+  Future<void>  receivedFcm() async {
+    emit(FcmTransactionConfirmed(transactionId: 1));
+  }
+
+  Future<void> addFcm() async {
+    await _firebaseMessaging.requestNotificationPermissions();
+    _firebaseMessaging.getToken().then((token) => _saveToken(token)); // save token after login
+  }
+
+  Future<void> removeFcm() async {
+    _firebaseMessaging.deleteInstanceID();
   }
 
   _saveToken(String token) async {

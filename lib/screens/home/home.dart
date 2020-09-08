@@ -13,13 +13,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>  {
-  HomeBloc _homeBloc;
+  HomeCubit _homeCubit;
   int _lastSelected;
 
   @override
   Widget build(BuildContext context) {
-    _homeBloc = BlocProvider.of<HomeBloc>(context);
-    return BlocListener<HomeBloc, HomeState>(
+    _homeCubit = BlocProvider.of<HomeCubit>(context);
+    return BlocListener<HomeCubit, HomeState>(
       listener: (context, state) {
         if (state is HomeActiveTab) {
           setState(() {
@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen>  {
           });
         }
       },
-      child: BlocBuilder<HomeBloc, HomeState>(
-        bloc: _homeBloc,
+      child: BlocBuilder<HomeCubit, HomeState>(
+        cubit: _homeCubit,
         builder: (context, state) {
           return _buildHomeScreen(context);
         },

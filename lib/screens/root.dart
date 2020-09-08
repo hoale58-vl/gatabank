@@ -4,14 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screen_router.dart';
-import 'package:gatabank/screens/auth/fcm_bloc.dart';
+import 'package:gatabank/screens/auth/fcm_cubit.dart';
 import 'package:gatabank/screens/home/home.dart';
 import 'package:gatabank/screens/login/login.dart';
-import 'package:gatabank/screens/login/login_bloc.dart';
+import 'package:gatabank/screens/login/login_cubit.dart';
 import 'package:gatabank/screens/userinfo/userinfo.dart';
 import 'package:gatabank/screens/userinfo/userinfo_bloc.dart';
 
-import 'auth/auth_bloc.dart';
+import 'auth/auth_cubit.dart';
 import 'auth/auth_states.dart';
 import 'home/home_bloc.dart';
 
@@ -47,21 +47,21 @@ class _RootState extends State<Root> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthenticationState>(
+    return BlocBuilder<AuthCubit, AuthenticationState>(
       builder: (context, state) {
         if (state is AuthenticationAuthenticated) {
           if (state.user.updatedInfo()){
             return MultiBlocProvider(
               providers: [
-                BlocProvider<HomeBloc>(
+                BlocProvider<HomeCubit>(
                   create: (context) {
-                    return HomeBloc(
+                    return HomeCubit(
                       userRepository: widget.userRepository,
                     );
                   },
                 ),
-                BlocProvider<FcmBloc>(create: (context) {
-                  return FcmBloc(userRepository: widget.userRepository);
+                BlocProvider<FcmCubit>(create: (context) {
+                  return FcmCubit(userRepository: widget.userRepository);
                 }),
               ],
               child: HomeScreen(),
@@ -69,15 +69,15 @@ class _RootState extends State<Root> {
           } else {
             return MultiBlocProvider(
               providers: [
-                BlocProvider<UserInfoBloc>(
+                BlocProvider<UserInfoCubit>(
                   create: (context) {
-                    return UserInfoBloc(
+                    return UserInfoCubit(
                       userRepository: widget.userRepository,
                     );
                   },
                 ),
-                BlocProvider<FcmBloc>(create: (context) {
-                  return FcmBloc(userRepository: widget.userRepository);
+                BlocProvider<FcmCubit>(create: (context) {
+                  return FcmCubit(userRepository: widget.userRepository);
                 }),
               ],
               child: UserInfoScreen(),
@@ -86,11 +86,11 @@ class _RootState extends State<Root> {
         }
 
         if (state is AuthenticationUnauthenticated) {
-          return BlocProvider<LoginBloc>(
+          return BlocProvider<LoginCubit>(
             create: (context) {
-              return LoginBloc(
+              return LoginCubit(
                 userRepository: widget.userRepository,
-                authBloc: BlocProvider.of<AuthBloc>(context),
+                authCubit: BlocProvider.of<AuthCubit>(context),
               );
             },
             child: LoginScreen(),
