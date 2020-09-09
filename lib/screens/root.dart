@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,7 +27,6 @@ class Root extends StatefulWidget {
 }
 
 class _RootState extends State<Root> {
-
   @override
   void initState() {
     _setupFirstTimeLaunchApp();
@@ -67,19 +68,12 @@ class _RootState extends State<Root> {
               child: HomeScreen(),
             );
           } else {
-            return MultiBlocProvider(
-              providers: [
-                BlocProvider<UserInfoCubit>(
-                  create: (context) {
-                    return UserInfoCubit(
-                      userRepository: widget.userRepository,
-                    );
-                  },
-                ),
-                BlocProvider<FcmCubit>(create: (context) {
-                  return FcmCubit(userRepository: widget.userRepository);
-                }),
-              ],
+            return BlocProvider<UserInfoCubit>(
+              create: (context) {
+                return UserInfoCubit(
+                  userRepository: widget.userRepository,
+                );
+              },
               child: UserInfoScreen(),
             );
           }

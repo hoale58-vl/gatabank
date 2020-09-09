@@ -1,7 +1,7 @@
 
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:gatabank/utils.dart';
+import 'package:gatabank/Utils.dart';
 
 class APIUnauthorizedException implements Exception {}
 
@@ -42,17 +42,17 @@ class API  {
 
   _logging() {
     return InterceptorsWrapper(onRequest: (RequestOptions options) async {
-      utils.log("DIO - REQUEST: [${options.method}] ${options.path}} \nbody:${options.data}");
+      Utils.log("DIO - REQUEST: [${options.method}] ${options.path}} \nbody:${options.data}");
 
       return options;
     }, onResponse: (Response response) async {
-      utils.log("DIO - RESPONSE: [${response.request.method}] ${response.request.path} "
+      Utils.log("DIO - RESPONSE: [${response.request.method}] ${response.request.path} "
           "${response.statusCode} [OK]\n"
           "body:${response.request.data}\n"
           "response:${response.data}");
       return response;
     }, onError: (DioError e) async {
-      utils.log("DIO - ERROR: ${e.request.path}\ndata: ${e.request.data}\nresponse:${e.response.data}");
+      Utils.log("DIO - ERROR: ${e.request.path}\ndata: ${e.request.data}\nresponse:${e.response.data}");
       if (e.response.statusCode == HttpStatus.unauthorized) {
         publishToErrorCallbacks(APIUnauthorizedException());
       } else {

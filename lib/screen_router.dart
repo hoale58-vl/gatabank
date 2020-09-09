@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gatabank/repositories/user.dart';
-import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/screens/onboarding/onboarding.dart';
 import 'package:gatabank/screens/root.dart';
 import 'package:gatabank/widgets/button_widget.dart';
@@ -8,12 +7,13 @@ import 'package:gatabank/widgets/button_widget.dart';
 class ScreenRouter {
   static const ROOT = '/';
   static const ONBOARDING = 'onboarding';
-  UserRepository userRepos;
-  AuthCubit authCubit;
+  static const PRIVATE_LOAN = 'private_loan';
+  static const CREDIT_CARD = 'credit_card';
+  static const INSURANCE = 'insurrance';
 
-  ScreenRouter(
-      {this.userRepos,
-        this.authCubit});
+  UserRepository userRepos;
+
+  ScreenRouter({this.userRepos});
 
   Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {

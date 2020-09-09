@@ -18,8 +18,7 @@ class Routes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var screenRouter = ScreenRouter(
-      userRepos: userRepos,
-      authCubit: BlocProvider.of<AuthCubit>(context),
+      userRepos: userRepos
     );
     final Themes theme = Provider.of<ThemeProvider>(context).getTheme(context);
     App.theme = theme;

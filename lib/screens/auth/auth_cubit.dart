@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/models/user.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screens/auth/fcm_cubit.dart';
@@ -24,6 +25,7 @@ class AuthCubit extends Cubit<AuthenticationState> {
   }
 
   Future<void> loggedIn(User user) async {
+    storage.saveUser(user);
     emit(AuthenticationAuthenticated(user: user));
     fcmCubit.addFcm();
   }

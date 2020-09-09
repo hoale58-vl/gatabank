@@ -4,16 +4,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gatabank/config.dart';
 
 class Utils {
-  static final Utils _singleton = new Utils();
-  var storage;
-
-  factory Utils() {
-    return _singleton;
-  }
 
   static getSvgPicture(String name) => SvgPicture.asset('assets/$name.svg');
 
-  toast(dynamic str) {
+  static toast(dynamic str) {
     Fluttertoast.showToast(
         msg: str,
         toastLength: Toast.LENGTH_LONG,
@@ -24,7 +18,7 @@ class Utils {
         fontSize: 15.0);
   }
 
-  errorToast(dynamic str) {
+  static errorToast(dynamic str) {
     Fluttertoast.showToast(
         msg: str,
         timeInSecForIos: 3,
@@ -34,11 +28,10 @@ class Utils {
         fontSize: 13.0);
   }
 
-  log(dynamic str) {
+  static log(dynamic str) {
     print('\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n'
         '$str'
         '\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n');
   }
 }
 
-final utils = new Utils();

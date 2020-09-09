@@ -7,17 +7,11 @@ class HomeInitial extends HomeState {
   String toString() => 'HomeInitial';
 }
 
-class HomeLoading extends HomeState {
-  @override
-  String toString() => 'HomeLoading';
-}
+class Navigate extends HomeState {
+  String screen;
 
-class HomeActiveTab extends HomeState {
-  final int index;
-
-  HomeActiveTab({this.index}) : super();
+  Navigate(this.screen) ;
 
   @override
-  String toString() => 'HomeActiveTab $index';
+  String toString() => 'Navigate';
 }
-

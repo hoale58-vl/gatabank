@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gatabank/validators/string_validator.dart';
+import 'package:gatabank/screen_router.dart';
+import 'package:gatabank/utils.dart';
 import 'package:gatabank/widgets/button_widget.dart';
 import 'package:gatabank/widgets/input_widget.dart';
 import 'package:gatabank/widgets/popup_widget.dart';
@@ -12,14 +15,11 @@ import 'userinfo_bloc.dart';
 import 'userinfo_states.dart';
 
 class UserInfoScreen extends StatefulWidget {
-  UserInfoScreen();
-
   @override
   _UserInfoState createState() => _UserInfoState();
 }
 
 class _UserInfoState extends State<UserInfoScreen>  {
-  UserInfoCubit _userInfoCubit;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   int _income;
@@ -27,6 +27,15 @@ class _UserInfoState extends State<UserInfoScreen>  {
   int _loanTerm;
   String _address;
   String _salaryReceiveMethod;
+  UserInfoCubit _userInfoCubit;
+
+  bool get submitBtnEnabled => _income != null && _loanExpected != null && _loanTerm != null && _address != null && _salaryReceiveMethod != null;
+
+  TextEditingController incomeController = TextEditingController();
+  TextEditingController loanExpectedController = TextEditingController();
+  TextEditingController loanTermController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController salaryReceiveMethodController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -34,12 +43,25 @@ class _UserInfoState extends State<UserInfoScreen>  {
 
     return BlocListener<UserInfoCubit, UserInfoState>(
       listener: (context, state) {
+        if (state is UpdateIncome) {
+          _income = state.income;
+        } else if (state is UpdateLoanExpected) {
+          _loanExpected = state.loanExpected;
+        } else if (state is UpdateLoanTerm) {
+          _loanTerm = state.loanTerm;
+        } else if (state is UpdateAddress) {
+          _address = state.address;
+        } else if (state is UpdateSalaryReceiveMethod) {
+          _salaryReceiveMethod = state.salaryReceiveMethod;
+        } else if (state is ShowError){
+          Utils.errorToast(state.errorMsg);
+        }
       },
-      child: BlocBuilder<UserInfoCubit, UserInfoState>(
+      child: BlocBuilder(
         cubit: _userInfoCubit,
         builder: (context, state) {
           if (state is UpdateUserSuccess) {
-            return Scaffold();
+            Navigator.pushNamed(context, ScreenRouter.ROOT);
           }
 
           return Scaffold(
@@ -50,7 +72,7 @@ class _UserInfoState extends State<UserInfoScreen>  {
             ),
           );
         },
-      ),
+      )
     );
   }
 
@@ -91,31 +113,78 @@ class _UserInfoState extends State<UserInfoScreen>  {
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Thu thập hằng\n tháng của tôi là", value: _income ?? '').getWidget(
+        RowItem('', "Thu thập hằng\n tháng của tôi là", value: _income != null ? _income.toString() : '').getWidget(
           onTap: () => {
             _handleInputUserInfo(
-              title: "Thu nhập hằng tháng",
-              onSaved: (value) => _income = value != null ? int.parse(value, onError: _income = null) : null,
-              onSubmit: () => Intent.doNothing
+              child: InputWidget(
+                  controller: incomeController,
+                  title: 'Thu nhập hằng tháng',
+                  onSaved: (value) => _income = value,
+              ),
+              onSubmit: () => _userInfoCubit.updateIncome(incomeController.text)
             )
           }
         ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi muốn vay", value: _loanExpected ?? '').getWidget(),
+        RowItem('', "Tôi muốn vay", value: _loanExpected != null ? _loanExpected.toString() : '').getWidget(
+            onTap: () => {
+              _handleInputUserInfo(
+                  child: InputWidget(
+                    controller: loanExpectedController,
+                    title: 'Số tiền muốn vay',
+                    onSaved: (value) => _loanExpected = value,
+                  ),
+                  onSubmit: () => _userInfoCubit.updateLoanExpected(loanExpectedController.text)
+              )
+            }
+        ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Kì hạn vay", value: _loanTerm ?? '').getWidget(),
+        RowItem('', "Kì hạn vay", value: _loanTerm != null ? _loanTerm.toString() : '').getWidget(
+            onTap: () => {
+              _handleInputUserInfo(
+                  child: InputWidget(
+                    controller: loanTermController,
+                    title: 'Kì hạn vay',
+                    onSaved: (value) => _loanTerm = value,
+                  ),
+                  onSubmit: () => _userInfoCubit.updateLoanTerm(loanTermController.text)
+              )
+            }
+        ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi sống ở", value: _address ?? '').getWidget(),
+        RowItem('', "Tôi sống ở", value: _address ?? '').getWidget(
+            onTap: () => {
+              _handleInputUserInfo(
+                  child: InputWidget(
+                    controller: addressController,
+                    title: 'Địa chỉ',
+                    onSaved: (value) => _address = value,
+                  ),
+                  onSubmit: () => _userInfoCubit.updateAddress(addressController.text)
+              )
+            }
+        ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi nhận lương bằng", value: _salaryReceiveMethod ?? '').getWidget(),
+        RowItem('', "Tôi nhận lương bằng", value: _salaryReceiveMethod ?? '').getWidget(
+            onTap: () => {
+              _handleInputUserInfo(
+                  child: InputWidget(
+                    controller: salaryReceiveMethodController,
+                    title: 'Phương thức nhận lương',
+                    onSaved: (value) => _salaryReceiveMethod = value,
+                  ),
+                  onSubmit: () => _userInfoCubit.updateSalaryReceiveMethod(salaryReceiveMethodController.text)
+              )
+            }
+        ),
         SizedBox(
           height: 25,
         ),
@@ -123,12 +192,11 @@ class _UserInfoState extends State<UserInfoScreen>  {
           padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 20),
           child: Column(
               children: <Widget>[
-                (state == UserInfoLoading())
-                    ? CircularProgressIndicator()
-                    : ButtonWidget(
+                ButtonWidget(
                   key: Key('BtnConfirm'),
                   onPressed: _handleConfirm,
                   title: "Xem kết quả",
+                  enabled: submitBtnEnabled,
                 ),
                 SizedBox(
                   height: 20,
@@ -224,7 +292,7 @@ class _UserInfoState extends State<UserInfoScreen>  {
     }
   }
 
-  _handleInputUserInfo({@required String title, @required Function(String) onSaved, @required VoidCallback onSubmit}) async {
+  _handleInputUserInfo({@required VoidCallback onSubmit, @required InputWidget child}) async {
     await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -236,17 +304,12 @@ class _UserInfoState extends State<UserInfoScreen>  {
                 .bottom),
             child: PopupWidget(
               icon: '',
-              title: title,
-              content: InputWidget(
-                title: title,
-                onSaved: (value) => onSaved(value),
-                validator: (value) => StringValidator.notEmpty(value),
-              ),
+              title: '',
+              content: child,
               actions: <Widget>[
                 ButtonWidget(
                   title: 'Quay lại',
                   onPressed: () {
-                    onSaved(null);
                     Navigator.pop(context);
                   },
                   buttonType: ButtonType.blue_border,

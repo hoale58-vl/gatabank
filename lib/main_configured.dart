@@ -9,7 +9,7 @@ import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/screens/auth/fcm_cubit.dart';
 import 'package:gatabank/theme/theme_provider.dart';
-import 'package:gatabank/utils.dart';
+import 'package:gatabank/Utils.dart';
 import 'package:provider/provider.dart';
 import 'package:gatabank/routes.dart';
 
@@ -27,7 +27,7 @@ class SimpleBlocObserver extends BlocObserver {
   @override
   void onError(Cubit cubit, Object error, StackTrace stacktrace) {
     super.onError(cubit, error, stacktrace);
-    utils.errorToast(error.toString());
+    Utils.errorToast(error.toString());
   }
 }
 
@@ -44,17 +44,16 @@ void mainDelegate() async {
         create: (_) => ThemeProvider(),
         child: BlocProvider<AuthCubit>(
           create: (context) {
-            var authBloc =
-            AuthCubit(userRepository: userRepos, fcmCubit: FcmCubit(userRepository: userRepos))
+            var authBit = AuthCubit(userRepository: userRepos, fcmCubit: FcmCubit(userRepository: userRepos))
               ..checkAuthentication();
 
             api.onError((Exception error) {
               if (error is APIUnauthorizedException) {
-                authBloc.loggedOut();
+                authBit.loggedOut();
               }
             });
 
-            return authBloc;
+            return authBit;
           },
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
