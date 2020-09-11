@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/config.dart';
+import 'package:gatabank/screen_router.dart';
 import 'package:gatabank/screens/private_loan/private_loan_cubit.dart';
 import 'package:gatabank/screens/private_loan/private_loan_states.dart';
 import 'package:gatabank/widgets/button_widget.dart';
@@ -166,7 +167,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
           child: RichText(
             text: TextSpan(
               text: "2.769.968đ /",
-              style: App.theme.styles.subTitle1.copyWith(color: App.theme.colors.text1),
+              style: App.theme.styles.title2.copyWith(color: App.theme.colors.text1),
               children: [
                 TextSpan(
                   text: "tháng",
@@ -179,8 +180,37 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         SizedBox(
           height: 10,
         ),
-        App.theme.getSvgPicture(
-          "ratio_bar",
+        Row(
+          children: [
+            Expanded(
+              flex: 50,
+              child: Padding(
+                padding: EdgeInsets.only(left: 20, right: 2),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(40.0),
+                  child: Container(
+                      height: 10,
+                      width: double.infinity,
+                      color: App.theme.colors.background1
+                  ),
+                ),
+              )
+            ),
+            Expanded(
+              flex: 16,
+              child: Padding(
+                padding: EdgeInsets.only(left: 2, right: 20),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(40.0),
+                  child: Container(
+                      height: 10,
+                      width: double.infinity,
+                      color: Color(0xFF113311)
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
         SizedBox(
           height: 10,
@@ -247,13 +277,23 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            ButtonWidget(
-              title: "So sánh".toUpperCase(),
-              onPressed: () => {},
+            Expanded(
+              flex: 1,
+              child: ButtonWidget(
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                title: "So sánh".toUpperCase(),
+                buttonType: ButtonType.gray_filled,
+                onPressed: () => {},
+              ),
             ),
-            ButtonWidget(
-              title: "Tìm hiểu thêm".toUpperCase(),
-              onPressed: () => {},
+            Expanded(
+              flex: 1,
+              child: ButtonWidget(
+                margin: EdgeInsets.symmetric(horizontal: 10),
+                title: "Tìm hiểu".toUpperCase(),
+                buttonType: ButtonType.white_filled,
+                onPressed: () => Navigator.pushNamed(context, ScreenRouter.LOAN_DETAIL),
+              ),
             )
           ],
         ),
@@ -261,10 +301,12 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
           height: 5,
         ),
         Padding(
-          padding: EdgeInsets.all(15),
+          padding: EdgeInsets.symmetric(vertical: 15),
           child: ButtonWidget(
+            margin: EdgeInsets.symmetric(horizontal: 10),
             title: "Đăng ký ngay".toUpperCase(),
             onPressed: () => {},
+            buttonType: ButtonType.orange_filled,
           ),
         ),
         SizedBox(

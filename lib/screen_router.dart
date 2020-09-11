@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/repositories/user.dart';
+import 'package:gatabank/screens/loan_detail/loan_detail_cubit.dart';
+import 'package:gatabank/screens/loan_detail/loan_detail_screen.dart';
 import 'package:gatabank/screens/onboarding/onboarding.dart';
 import 'package:gatabank/screens/private_loan/private_loan_cubit.dart';
 import 'package:gatabank/screens/private_loan/private_loan_screen.dart';
@@ -13,6 +15,7 @@ class ScreenRouter {
   static const PRIVATE_LOAN = 'private_loan';
   static const CREDIT_CARD = 'credit_card';
   static const INSURANCE = 'insurrance';
+  static const LOAN_DETAIL = 'loan_detail';
 
   UserRepository userRepos;
 
@@ -39,6 +42,16 @@ class ScreenRouter {
               return PrivateLoanCubit();
             },
             child: PrivateLoanScreen(),
+          ),
+          settings: settings,
+        );
+      case LOAN_DETAIL:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<LoanDetailCubit>(
+            create: (context) {
+              return LoanDetailCubit();
+            },
+            child: LoanDetailScreen(),
           ),
           settings: settings,
         );

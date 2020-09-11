@@ -74,6 +74,7 @@ class RowItem {
             ? Container()
             : Container(
             child: Text(value,
+                textAlign: TextAlign.end,
                 style: App.theme.styles.subTitle2
                     .copyWith(color: valueColor ?? App.theme.colors.primary))),
         disableTrailing ? Container() : Icon(

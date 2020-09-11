@@ -8,7 +8,7 @@ const DEFAULT_HEIGHT = 35.0;
 const DEFAULT_BORDER_WIDTH = 1.0;
 const DEFAULT_MARGIN = const EdgeInsets.symmetric(horizontal: 0);
 
-enum ButtonType { blue_filled, red_filled, blue_border, white_border, transparent }
+enum ButtonType { blue_filled, gray_filled, orange_filled, red_filled, white_filled, blue_border, white_border, transparent }
 
 class ButtonWidget extends StatefulWidget {
   final Function onPressed;
@@ -67,6 +67,21 @@ class _ButtonWidgetState extends State<ButtonWidget> {
         backgroundColor = theme.colors.primary;
         textColor = Colors.white;
         break;
+      case ButtonType.gray_filled:
+        borderColor = Color(0xFFE1E1E1);
+        backgroundColor = Color(0xFFE1E1E1);
+        textColor = Colors.black;
+        break;
+      case ButtonType.orange_filled:
+        borderColor = theme.colors.background1;
+        backgroundColor = theme.colors.background1;
+        textColor = Colors.white;
+        break;
+      case ButtonType.white_filled:
+        borderColor = Color(0xAAEEE1E1);
+        backgroundColor = theme.colors.background;
+        textColor = Colors.black;
+        break;
       case ButtonType.blue_border:
         borderColor = theme.colors.primary;
         backgroundColor = Colors.transparent;
@@ -103,6 +118,13 @@ class _ButtonWidgetState extends State<ButtonWidget> {
       decoration: BoxDecoration(
           border: Border.all(color: borderColor, width: widget.borderWidth),
           borderRadius: widget.borderRadius,
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: borderColor.withOpacity(0.5),
+              blurRadius: 1,
+              offset: Offset(2, 2),
+            ),
+          ],
           color: backgroundColor),
       child: FlatButton(
         padding: EdgeInsets.symmetric(horizontal: 35),
