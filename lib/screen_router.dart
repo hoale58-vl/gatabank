@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screens/onboarding/onboarding.dart';
+import 'package:gatabank/screens/private_loan/private_loan_cubit.dart';
+import 'package:gatabank/screens/private_loan/private_loan_screen.dart';
 import 'package:gatabank/screens/root.dart';
 import 'package:gatabank/widgets/button_widget.dart';
 
@@ -27,6 +30,16 @@ class ScreenRouter {
       case ONBOARDING:
         return MaterialPageRoute(
           builder: (context) => OnboardingScreen(),
+          settings: settings,
+        );
+      case PRIVATE_LOAN:
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider<PrivateLoanCubit>(
+            create: (context) {
+              return PrivateLoanCubit();
+            },
+            child: PrivateLoanScreen(),
+          ),
           settings: settings,
         );
       default:

@@ -8,8 +8,9 @@ class RowItem {
   final Action action;
   final String value;
   final Widget trailing;
-  final bool hasDivider;
-  final Color color, valueColor;
+  final bool hasDivider, disableTrailing;
+  final Color color, valueColor, backGroundColor;
+  final EdgeInsetsGeometry padding;
 
   RowItem(this.icon, this.name,
       {this.action,
@@ -17,12 +18,16 @@ class RowItem {
         this.trailing,
         this.hasDivider = true,
         this.color,
+        this.backGroundColor,
+        this.padding,
+        this.disableTrailing = false,
         this.valueColor});
 
   Widget getWidget({BuildContext context, VoidCallback onTap}) {
     return InkWell(
       child: Container(
-        padding: EdgeInsets.only(top: 15, left: 20),
+        color: this.backGroundColor,
+        padding: padding ?? EdgeInsets.only(top: disableTrailing ? 20 : 15, left: 20),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           (this.icon.isNotEmpty) ? App.theme.getSvgPicture(this.icon) : Container(),
           (this.icon.isNotEmpty) ? SizedBox(width: 15) : Container(),
@@ -39,7 +44,7 @@ class RowItem {
                     _buildTrailing(context),
                   ],
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: 20),
                 Divider(
                     color: hasDivider ? App.theme.colors.divider : Colors.transparent,
                     height: 1,
@@ -71,7 +76,7 @@ class RowItem {
             child: Text(value,
                 style: App.theme.styles.subTitle2
                     .copyWith(color: valueColor ?? App.theme.colors.primary))),
-        Icon(
+        disableTrailing ? Container() : Icon(
           Icons.keyboard_arrow_right,
           size: 25.0,
           color: App.theme.colors.button1,

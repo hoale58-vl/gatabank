@@ -15,6 +15,7 @@ final lightTheme = Themes(
         button1: Color(0xFF000000),
         primary: Color(0xFF21409A),
         background: Color(0xFFFFFFFF),
+        background1: Color(0xFFFF8400),
         text1: Color(0xFF000000),
         text2: Color(0xFF21409A),
         text3: Color(0x29FFFFFF),

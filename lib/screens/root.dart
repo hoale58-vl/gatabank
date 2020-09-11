@@ -8,6 +8,7 @@ import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screen_router.dart';
 import 'package:gatabank/screens/auth/fcm_cubit.dart';
 import 'package:gatabank/screens/home/home.dart';
+import 'package:gatabank/screens/home/home_cubit.dart';
 import 'package:gatabank/screens/login/login.dart';
 import 'package:gatabank/screens/login/login_cubit.dart';
 import 'package:gatabank/screens/userinfo/userinfo.dart';
@@ -15,7 +16,6 @@ import 'package:gatabank/screens/userinfo/userinfo_bloc.dart';
 
 import 'auth/auth_cubit.dart';
 import 'auth/auth_states.dart';
-import 'home/home_bloc.dart';
 
 class Root extends StatefulWidget {
   final UserRepository userRepository;
