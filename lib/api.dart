@@ -62,24 +62,13 @@ class API  {
     });
   }
 
-  Future<Response> sendOTP(String phone) async {
-    return Response(
-      statusCode: 200
-    );
+  Future<Response> sendOTP({String phone}) async {
     return await _dio.post('/otp/send', data: {
       "phone": phone
     });
   }
 
-  Future<Response> verifyOtp(String phone, String otp) async {
-    return Response(
-      data: {
-        "id": "1",
-        "full_name": "Lvhoa",
-        "phone": phone
-      },
-      statusCode: 200
-    );
+  Future<Response> verifyOtp({String phone, String otp}) async {
     return await _dio.post('/otp/verify', data: {
       "phone": phone,
       "otp": otp
@@ -91,11 +80,16 @@ class API  {
     return await _dio.post("/device/add", data: {"Token": fcmToken});
   }
 
-  Future<Response> updateInfo(String userId, Map<String, dynamic> json) async {
-    return Response (
-      statusCode: 200
-    );
+  Future<Response> updateInfo({String userId, Map<String, dynamic> json}) async {
     return await _dio.put('/user/$userId', data: json);
+  }
+
+  Future<Response> listBanks() {
+
+  }
+
+  void addErrorInterceptor(callback) {
+    _onErrorCallbacks.add(callback);
   }
 }
 

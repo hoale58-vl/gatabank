@@ -11,6 +11,7 @@ class RowItem {
   final bool hasDivider, disableTrailing;
   final Color color, valueColor, backGroundColor;
   final EdgeInsetsGeometry padding;
+  final double sizedBox;
 
   RowItem(this.icon, this.name,
       {this.action,
@@ -21,6 +22,7 @@ class RowItem {
         this.backGroundColor,
         this.padding,
         this.disableTrailing = false,
+        this.sizedBox = 20,
         this.valueColor});
 
   Widget getWidget({BuildContext context, VoidCallback onTap}) {
@@ -44,7 +46,7 @@ class RowItem {
                     _buildTrailing(context),
                   ],
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: sizedBox),
                 Divider(
                     color: hasDivider ? App.theme.colors.divider : Colors.transparent,
                     height: 1,

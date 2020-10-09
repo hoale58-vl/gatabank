@@ -1,79 +1,90 @@
-import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:gatabank/models/storage.dart';
+import 'package:gatabank/models/user.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'userinfo_states.dart';
 
 class UserInfoCubit extends Cubit<UserInfoState> {
   final UserRepository userRepository;
+  User user;
+  UserInfoCubit(this.userRepository) : super(UserInfoInitial());
 
-  UserInfoCubit({@required this.userRepository}) : super(UserInfoInitial());
+  Future<void> loadUser() async {
+    emit(UserInfoLoading());
+    user = storage.getUser();
+    emit(UserInfoLoaded(user));
+  }
 
   Future<void> updateIncome(String income) async {
     final result = int.tryParse(income);
-    emit(UpdateIncome(result));
+    user.income = result;
     if (result == null){
       emit(ShowError("Mức thu nhập không hợp lệ"));
     }
+    emit(UserInfoLoaded(user));
   }
 
   Future<void> updateLoanExpected(String loanExpected) async {
     final result = int.tryParse(loanExpected);
-    emit(UpdateLoanExpected(result));
+    user.loanExpected = result;
     if (result == null){
       emit(ShowError("Khoảng vay không hợp lệ"));
     }
+    emit(UserInfoLoaded(user));
   }
 
-  Future<void> updateLoanTerm(String loanTerm) async {
-    final result = int.tryParse(loanTerm);
-    emit(UpdateLoanTerm(result));
-    if (result == null){
-      emit(ShowError("Thời hạn vay không được để trống"));
-    }
+  Future<void> updateLoanTerm(int loanTerm) async {
+    user.loanTerm = loanTerm;
+    emit(UserInfoLoaded(user));
   }
 
   Future<void> updateAddress(String address) async {
-    emit(UpdateAddress(address));
+    user.address = address;
     if (address == null || address.isEmpty){
       emit(ShowError("Địa chỉ không được để trống"));
     }
+    emit(UserInfoLoaded(user));
   }
 
   Future<void> updateSalaryReceiveMethod(String salaryReceiveMethod) async {
-    emit(UpdateSalaryReceiveMethod(salaryReceiveMethod));
+    user.salaryReceiveMethod = salaryReceiveMethod;
     if (salaryReceiveMethod == null || salaryReceiveMethod.isEmpty){
       emit(ShowError("Phương thức thanh toán không được để trống"));
     }
+    emit(UserInfoLoaded(user));
   }
 
-  Future<void> submitData({
-    @required int income,
-    @required int loanExpected,
-    @required int loanTerm,
-    @required String address,
-    @required String salaryReceiveMethod
-  }) async {
+  Future<void> submitData() async {
     emit(UserInfoLoading());
     try {
-      final user = await userRepository.updateInfo(
-          income: income,
-          loanExpected: loanExpected,
-          loanTerm: loanTerm,
-          address: address,
-          salaryReceiveMethod: salaryReceiveMethod
+      final _user = await userRepository.updateInfo(
+          income: user.income,
+          loanExpected: user.loanExpected,
+          loanTerm: user.loanTerm,
+          address: user.address,
+          salaryReceiveMethod: user.salaryReceiveMethod
       );
 
-      if (user != null) {
-        storage.saveUser(user);
+      if (_user != null) {
+        storage.saveUser(_user);
         emit(UpdateUserSuccess());
       } else {
         emit(UpdateUserFailure());
+        emit(UserInfoLoaded(user));
       }
     } catch (error) {
       emit(UpdateUserFailure());
+      emit(UserInfoLoaded(user));
     }
+  }
+
+  Future<void> resetForm() async {
+    user.income = null;
+    user.loanExpected = null;
+    user.loanTerm = null;
+    user.address = null;
+    user.salaryReceiveMethod = null;
+    emit(UserInfoLoaded(user));
   }
 }

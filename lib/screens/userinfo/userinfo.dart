@@ -3,12 +3,15 @@ import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gatabank/models/user.dart';
 import 'package:gatabank/screen_router.dart';
 import 'package:gatabank/utils.dart';
+import 'package:gatabank/utils/numeric_text_formatter.dart';
 import 'package:gatabank/widgets/button_widget.dart';
 import 'package:gatabank/widgets/input_widget.dart';
 import 'package:gatabank/widgets/popup_widget.dart';
 import 'package:gatabank/widgets/row_item.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 import '../../config.dart';
 import 'userinfo_bloc.dart';
@@ -22,73 +25,67 @@ class UserInfoScreen extends StatefulWidget {
 class _UserInfoState extends State<UserInfoScreen>  {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  int _income;
-  int _loanExpected;
-  int _loanTerm;
-  String _address;
-  String _salaryReceiveMethod;
   UserInfoCubit _userInfoCubit;
-
-  bool get submitBtnEnabled => _income != null && _loanExpected != null && _loanTerm != null && _address != null && _salaryReceiveMethod != null;
 
   TextEditingController incomeController = TextEditingController();
   TextEditingController loanExpectedController = TextEditingController();
-  TextEditingController loanTermController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController salaryReceiveMethodController = TextEditingController();
+
+  @override
+  void initState(){
+    super.initState();
+    _userInfoCubit = BlocProvider.of<UserInfoCubit>(context);
+    _userInfoCubit.loadUser();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _userInfoCubit = BlocProvider.of<UserInfoCubit>(context);
-
     return BlocListener<UserInfoCubit, UserInfoState>(
       listener: (context, state) {
-        if (state is UpdateIncome) {
-          _income = state.income;
-        } else if (state is UpdateLoanExpected) {
-          _loanExpected = state.loanExpected;
-        } else if (state is UpdateLoanTerm) {
-          _loanTerm = state.loanTerm;
-        } else if (state is UpdateAddress) {
-          _address = state.address;
-        } else if (state is UpdateSalaryReceiveMethod) {
-          _salaryReceiveMethod = state.salaryReceiveMethod;
-        } else if (state is ShowError){
+        if (state is ShowError){
           Utils.errorToast(state.errorMsg);
+        } else if (state is UpdateUserSuccess) {
+          Navigator.pushNamed(context, ScreenRouter.ROOT);
         }
       },
-      child: BlocBuilder(
-        cubit: _userInfoCubit,
-        builder: (context, state) {
-          if (state is UpdateUserSuccess) {
-            Navigator.pushNamed(context, ScreenRouter.ROOT);
-          }
-
-          return Scaffold(
-            appBar: null,
-            body: Container(
-              color: App.theme.colors.background,
-              child: _buildContent(state),
+      child: Scaffold(
+        appBar: null,
+        body: Container(
+          color: App.theme.colors.background,
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              child: Form(
+                  key: _formKey,
+                  child: BlocBuilder<UserInfoCubit, UserInfoState>(
+                    builder: (context, state) {
+                      if (state is UserInfoLoaded){
+                        return _buildUserInfoScreen(state);
+                      }
+                      return Container(
+                        color: App.theme.colors.background,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  App.theme.colors.primary
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+              ),
             ),
-          );
-        },
+          ),
+        ),
       )
     );
   }
 
-  Widget _buildContent(UserInfoState state) {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-        child: Form(
-            key: _formKey,
-            child: _buildUserInfoScreen(state)
-        ),
-      ),
-    );
-  }
-
-  Widget _buildUserInfoScreen(UserInfoState state) {
+  Widget _buildUserInfoScreen(UserInfoLoaded state) {
     return Column(
       children: <Widget>[
         Image.asset(
@@ -113,58 +110,78 @@ class _UserInfoState extends State<UserInfoScreen>  {
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Thu thập hằng\n tháng của tôi là", value: _income != null ? _income.toString() : '').getWidget(
+        RowItem('', "Thu thập hằng\n tháng của tôi là", value: state.user.income != null ? Utils.localeCurrency(state.user.income.toDouble()) : '').getWidget(
           onTap: () => {
             _handleInputUserInfo(
               child: InputWidget(
                   controller: incomeController,
                   title: 'Thu nhập hằng tháng',
-                  onSaved: (value) => _income = value,
+                  onSaved: (value) => state.user.income = value,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  NumericTextFormatter()
+                ],
               ),
-              onSubmit: () => _userInfoCubit.updateIncome(incomeController.text)
+              onSubmit: () => _userInfoCubit.updateIncome(incomeController.text.replaceAll(",", ""))
             )
           }
         ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi muốn vay", value: _loanExpected != null ? _loanExpected.toString() : '').getWidget(
+        RowItem('', "Tôi muốn vay", value: state.user.loanExpected != null ? Utils.localeCurrency(state.user.loanExpected.toDouble()) : '').getWidget(
             onTap: () => {
               _handleInputUserInfo(
                   child: InputWidget(
                     controller: loanExpectedController,
                     title: 'Số tiền muốn vay',
-                    onSaved: (value) => _loanExpected = value,
+                    onSaved: (value) => state.user.loanExpected = value,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      NumericTextFormatter()
+                    ],
                   ),
-                  onSubmit: () => _userInfoCubit.updateLoanExpected(loanExpectedController.text)
+                  onSubmit: () => _userInfoCubit.updateLoanExpected(loanExpectedController.text.replaceAll(",", ""))
               )
             }
         ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Kì hạn vay", value: _loanTerm != null ? _loanTerm.toString() : '').getWidget(
+        RowItem('', "Kì hạn vay", value: state.user.loanTerm != null ? "${state.user.loanTerm.toString()} tháng" : '').getWidget(
             onTap: () => {
               _handleInputUserInfo(
-                  child: InputWidget(
-                    controller: loanTermController,
-                    title: 'Kì hạn vay',
-                    onSaved: (value) => _loanTerm = value,
+                  child: Column(
+                    children: [
+                      Text(
+                        "Kỳ hạn vay (tháng)",
+                        style: App.theme.styles.subTitle1.copyWith(color: App.theme.colors.text1),
+                      ),
+                      SizedBox(height: 10),
+                      NumberPicker.integer(
+                          initialValue: 3,
+                          minValue: 1,
+                          maxValue: 100,
+                          onChanged: (value) {
+                            state.user.loanTerm = value;
+                          }
+                      )
+                    ],
                   ),
-                  onSubmit: () => _userInfoCubit.updateLoanTerm(loanTermController.text)
+                  onSubmit: () => _userInfoCubit.updateLoanTerm(state.user.loanTerm)
               )
             }
         ),
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi sống ở", value: _address ?? '').getWidget(
+        RowItem('', "Tôi sống ở", value: state.user.address ?? '').getWidget(
             onTap: () => {
               _handleInputUserInfo(
                   child: InputWidget(
                     controller: addressController,
                     title: 'Địa chỉ',
-                    onSaved: (value) => _address = value,
+                    onSaved: (value) => state.user.address = value,
                   ),
                   onSubmit: () => _userInfoCubit.updateAddress(addressController.text)
               )
@@ -173,15 +190,39 @@ class _UserInfoState extends State<UserInfoScreen>  {
         SizedBox(
           height: 15,
         ),
-        RowItem('', "Tôi nhận lương bằng", value: _salaryReceiveMethod ?? '').getWidget(
+        RowItem('', "Tôi nhận lương bằng", value: state.user.salaryReceiveMethod ?? '').getWidget(
             onTap: () => {
               _handleInputUserInfo(
-                  child: InputWidget(
-                    controller: salaryReceiveMethodController,
-                    title: 'Phương thức nhận lương',
-                    onSaved: (value) => _salaryReceiveMethod = value,
+                  child: Column(
+                    children: [
+                      Text(
+                        "Phương thức nhận lương",
+                        style: App.theme.styles.subTitle1.copyWith(color: App.theme.colors.text1),
+                      ),
+                      SizedBox(height: 10),
+                      DropdownButton<String>(
+                        value: state.user.salaryReceiveMethod,
+                        iconSize: 24,
+                        elevation: 16,
+                        style: App.theme.styles.body1.copyWith(color: App.theme.colors.text1),
+                        underline: Container(
+                          height: 2,
+                          color: App.theme.colors.text1,
+                        ),
+                        onChanged: (String newValue) {
+                          _userInfoCubit.updateSalaryReceiveMethod(newValue);
+                          Navigator.pop(context);
+                        },
+                        items: <String>['Tiền mặt', 'Thẻ tín dụng', 'Chuyển khoản', 'Không có', 'Khác']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      )
+                    ],
                   ),
-                  onSubmit: () => _userInfoCubit.updateSalaryReceiveMethod(salaryReceiveMethodController.text)
               )
             }
         ),
@@ -196,7 +237,7 @@ class _UserInfoState extends State<UserInfoScreen>  {
                   key: Key('BtnConfirm'),
                   onPressed: _handleConfirm,
                   title: "Xem kết quả",
-                  enabled: submitBtnEnabled,
+                  enabled: state.submitBtnEnabled,
                 ),
                 SizedBox(
                   height: 20,
@@ -271,28 +312,22 @@ class _UserInfoState extends State<UserInfoScreen>  {
   }
 
   _handleResetForm() {
-    setState(() {
-      _income = null;
-      _loanExpected = null;
-      _loanTerm = null;
-      _address = null;
-      _salaryReceiveMethod = null;
-    });
+    Utils.showCustomDialog(context,
+        title: "Xóa dữ liệu hiện tại",
+        content: "Bạn có muốn nhập lại thông tin tài khoản",
+        onSubmit: () {
+          _userInfoCubit.resetForm();
+        }
+    );
   }
 
   _handleConfirm() {
     if (_validateAndSave()) {
-      _userInfoCubit.submitData(
-          income: _income,
-          loanExpected: _loanExpected,
-          loanTerm: _loanTerm,
-          address: _address,
-          salaryReceiveMethod: _salaryReceiveMethod
-      );
+      _userInfoCubit.submitData();
     }
   }
 
-  _handleInputUserInfo({@required VoidCallback onSubmit, @required InputWidget child}) async {
+  _handleInputUserInfo({VoidCallback onSubmit, @required Widget child}) async {
     await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -306,7 +341,7 @@ class _UserInfoState extends State<UserInfoScreen>  {
               icon: '',
               title: '',
               content: child,
-              actions: <Widget>[
+              actions: onSubmit != null ? <Widget>[
                 ButtonWidget(
                   title: 'Quay lại',
                   onPressed: () {
@@ -325,7 +360,7 @@ class _UserInfoState extends State<UserInfoScreen>  {
                   },
                   buttonType: ButtonType.red_filled,
                 )
-              ],
+              ] : [],
             ),
           );
         });

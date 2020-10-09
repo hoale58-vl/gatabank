@@ -6,6 +6,7 @@ import 'package:gatabank/widgets/button_widget.dart';
 import 'package:gatabank/widgets/input_widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../screen_router.dart';
 import 'login_cubit.dart';
 import 'login_states.dart';
 
@@ -195,14 +196,15 @@ class _LoginScreenState extends State<LoginScreen> {
               textColor: Colors.white,
               fontSize: 15.0);
         }
+        if (state is LoginSuccess) {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+              ScreenRouter.ROOT, (route) => false);
+        }
+
       },
       child: BlocBuilder<LoginCubit, LoginState>(
         cubit: _loginCubit,
         builder: (context, state) {
-          if (state is LoginSuccess) {
-            return Scaffold();
-          }
-
           return Scaffold(
             appBar: null,
             body: Container(

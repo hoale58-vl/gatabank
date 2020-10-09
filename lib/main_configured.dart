@@ -7,7 +7,6 @@ import 'package:gatabank/api.dart';
 import 'package:gatabank/models/storage.dart';
 import 'package:gatabank/repositories/user.dart';
 import 'package:gatabank/screens/auth/auth_cubit.dart';
-import 'package:gatabank/screens/auth/fcm_cubit.dart';
 import 'package:gatabank/theme/theme_provider.dart';
 import 'package:gatabank/Utils.dart';
 import 'package:provider/provider.dart';
@@ -44,8 +43,8 @@ void mainDelegate() async {
         create: (_) => ThemeProvider(),
         child: BlocProvider<AuthCubit>(
           create: (context) {
-            var authBit = AuthCubit(userRepository: userRepos, fcmCubit: FcmCubit(userRepository: userRepos))
-              ..checkAuthentication();
+            var authBit = AuthCubit(userRepos)
+              ..check();
 
             api.onError((Exception error) {
               if (error is APIUnauthorizedException) {
@@ -57,8 +56,7 @@ void mainDelegate() async {
           },
           child: MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: Routes(
-                userRepos: userRepos),
+            home: Routes(userRepos: userRepos),
           ),
         ),
       ),

@@ -53,10 +53,10 @@ class _PopupWidgetState extends State<PopupWidget> {
             SizedBox(
               height: 20,
             ),
-            App.theme.getSvgPicture(
+            widget.icon.isNotEmpty ? App.theme.getSvgPicture(
               widget.icon,
               width: 80,
-            ),
+            ) : Container(),
             Padding(
               padding: const EdgeInsets.only(top: 20.0, left: 10, right: 10),
               child: Text(

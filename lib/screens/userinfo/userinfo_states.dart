@@ -1,4 +1,6 @@
 
+import 'package:gatabank/models/user.dart';
+
 abstract class UserInfoState  {
   UserInfoState() : super();
 }
@@ -6,6 +8,16 @@ abstract class UserInfoState  {
 class UserInfoInitial extends UserInfoState {
   @override
   String toString() => 'UserInfoInitial';
+}
+
+class UserInfoLoaded extends UserInfoState {
+  final User user;
+  bool get submitBtnEnabled {
+    return user.income != null && user.loanExpected != null && user.loanTerm != null && user.address != null && user.salaryReceiveMethod != null;
+  }
+  UserInfoLoaded(this.user);
+  @override
+  String toString() => 'UserInfoLoaded';
 }
 
 class UserInfoLoading extends UserInfoState {
@@ -21,41 +33,6 @@ class UpdateUserFailure extends UserInfoState {
 class UpdateUserSuccess extends UserInfoState {
   @override
   String toString() => 'UpdateUserSuccess';
-}
-
-class UpdateIncome extends UserInfoState {
-  final int income;
-  UpdateIncome(this.income) : super();
-  @override
-  String toString() => 'UpdateIncome';
-}
-
-class UpdateLoanExpected extends UserInfoState {
-  final int loanExpected;
-  UpdateLoanExpected(this.loanExpected) : super();
-  @override
-  String toString() => 'UpdateLoanExpected';
-}
-
-class UpdateLoanTerm extends UserInfoState {
-  final int loanTerm;
-  UpdateLoanTerm(this.loanTerm) : super();
-  @override
-  String toString() => 'UpdateLoanTerm';
-}
-
-class UpdateAddress extends UserInfoState {
-  final String address;
-  UpdateAddress(this.address) : super();
-  @override
-  String toString() => 'UpdateAddress';
-}
-
-class UpdateSalaryReceiveMethod extends UserInfoState {
-  final String salaryReceiveMethod;
-  UpdateSalaryReceiveMethod(this.salaryReceiveMethod) : super();
-  @override
-  String toString() => 'UpdateSalaryReceiveMethod';
 }
 
 class ShowError extends UserInfoState {

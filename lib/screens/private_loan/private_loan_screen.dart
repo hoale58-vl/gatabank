@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gatabank/config.dart';
+import 'package:gatabank/models/bank.dart';
 import 'package:gatabank/screen_router.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/screens/private_loan/private_loan_cubit.dart';
 import 'package:gatabank/screens/private_loan/private_loan_states.dart';
+import 'package:gatabank/utils.dart';
 import 'package:gatabank/widgets/button_widget.dart';
+import 'package:gatabank/widgets/ratio_bar.dart';
 import 'package:gatabank/widgets/row_item.dart';
 
 
@@ -18,39 +23,66 @@ class PrivateLoanScreen extends StatefulWidget {
 
 class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
   PrivateLoanCubit _privateLoanCubit;
+  String _filterType = FilterType.PAYMENT_EACH_MONTH;
+
+  @override
+  void initState(){
+    super.initState();
+    _privateLoanCubit = BlocProvider.of<PrivateLoanCubit>(context);
+    _privateLoanCubit.getListBanks();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _privateLoanCubit = BlocProvider.of<PrivateLoanCubit>(context);
-
     return BlocListener<PrivateLoanCubit, PrivateLoanState>(
-      listener: (context, state) {},
-      child: BlocBuilder<PrivateLoanCubit, PrivateLoanState>(
-        cubit: _privateLoanCubit,
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              backgroundColor: App.theme.colors.background1,
-              title: Text("Vay Tín Dụng"),
-              actions: <Widget>[
-                Padding(
-                    padding: EdgeInsets.only(right: 20.0),
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: Icon(
-                        Icons.menu,
-                        size: 26.0,
-                      ),
-                    )
+      listener: (context, state) {
+        if (state is UpdateFilterType){
+          setState(() {
+            _filterType = state.filterType;
+          });
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: App.theme.colors.background1,
+          title: Text("Vay Tín Dụng"),
+          actions: <Widget>[
+            InkWell(
+              onTap: () => Utils.showCustomDialog(context,
+                  title: "Nhập lại thông tin",
+                  content: "Bạn có muốn nhập lại thông tin tài khoản",
+                  onSubmit: () {
+                    Navigator.pushNamed(context, ScreenRouter.USER_INFO);
+                  }
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Icon(
+                    Icons.update
                 ),
-              ],
+              ),
             ),
-            body: Container(
-              color: App.theme.colors.background,
-              child: _buildPrivateLoanScreen(),
-            ),
-          );
-        },
+            InkWell(
+              onTap: () => Utils.showCustomDialog(context,
+                  title: "Đăng xuất",
+                  content: "Bạn có muốn đăng xuất tài khoản",
+                  onSubmit: () {
+                    BlocProvider.of<AuthCubit>(context).loggedOut();
+                  }
+              ),
+              child: Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Icon(
+                    Icons.exit_to_app
+                ),
+              ),
+            )
+          ],
+        ),
+        body: Container(
+          color: App.theme.colors.background,
+          child: _buildPrivateLoanScreen(),
+        ),
       ),
     );
   }
@@ -64,7 +96,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
           Expanded(
             flex: 1,
             child: App.theme.getSvgPicture(
-                active ? "stick_on": "stick_off",
+                active ? "stick_on_2": "stick_off",
                 width: 30
             ),
           ),
@@ -117,35 +149,43 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
       ),
       children: [
         RowItem(
-          "stick_off",
-          "Trả mỗi tháng",
+            _filterType == FilterType.PAYMENT_EACH_MONTH ? "stick_on" : "stick_off",
+          "Trả mỗi tháng: thấp đến cao",
             disableTrailing: true,
             backGroundColor: App.theme.colors.background
-        ).getWidget(),
+        ).getWidget(
+          onTap: () => _privateLoanCubit.setFilter(FilterType.PAYMENT_EACH_MONTH),
+        ),
         RowItem(
-          "stick_off",
-          "Tổng phải trả",
+            _filterType == FilterType.TOTAL_PAYMENT ? "stick_on" : "stick_off",
+          "Tổng phải trả: thấp đến cao",
             disableTrailing: true,
             backGroundColor: App.theme.colors.background
-        ).getWidget(),
+        ).getWidget(
+          onTap: () => _privateLoanCubit.setFilter(FilterType.TOTAL_PAYMENT),
+        ),
         RowItem(
-          "stick_off",
+            _filterType == FilterType.DISCOUNT ? "stick_on" : "stick_off",
           "Khuyến mãi",
             disableTrailing: true,
             backGroundColor: App.theme.colors.background
-        ).getWidget(),
+        ).getWidget(
+          onTap: () => _privateLoanCubit.setFilter(FilterType.DISCOUNT),
+        ),
         RowItem(
-          "stick_off",
-          "Lãi suất",
+            _filterType == FilterType.INTEREST ? "stick_on" : "stick_off",
+          "Lãi suất: thấp đến cao",
             disableTrailing: true,
             hasDivider: false,
             backGroundColor: App.theme.colors.background
-        ).getWidget()
+        ).getWidget(
+          onTap: () => _privateLoanCubit.setFilter(FilterType.INTEREST),
+        )
       ],
     ),
   );
 
-  Widget _buildListResult(String logo) => Card(
+  Widget _buildResultCard(BankListSuccess state, Bank bank) => Card(
     elevation: 7,
     margin: EdgeInsets.fromLTRB(15, 15, 15, 30),
     child: Column(
@@ -155,18 +195,21 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         SizedBox(
           height: 10,
         ),
-        Image(image: AssetImage('assets/$logo.png')),
+        Image(image: AssetImage(bank.image), height: 70,),
         SizedBox(
           height: 10,
         ),
-        Text("Vay tín chấp, thu nhập từ lương và\n tự doanh", style: App.theme.styles.body1.copyWith(color: App.theme.colors.text1), textAlign: TextAlign.center,),
+        Text("Vay tín chấp, thu nhập từ lương và\n tự doanh",
+          style: App.theme.styles.body1.copyWith(color: App.theme.colors.text1),
+          textAlign: TextAlign.center
+        ),
         SizedBox(
           height: 20,
         ),
         InkWell(
           child: RichText(
             text: TextSpan(
-              text: "2.769.968đ /",
+              text: "${Utils.currencyFormat(2769968)} /",
               style: App.theme.styles.title2.copyWith(color: App.theme.colors.text1),
               children: [
                 TextSpan(
@@ -180,45 +223,14 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         SizedBox(
           height: 10,
         ),
-        Row(
-          children: [
-            Expanded(
-              flex: 50,
-              child: Padding(
-                padding: EdgeInsets.only(left: 20, right: 2),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(40.0),
-                  child: Container(
-                      height: 10,
-                      width: double.infinity,
-                      color: App.theme.colors.background1
-                  ),
-                ),
-              )
-            ),
-            Expanded(
-              flex: 16,
-              child: Padding(
-                padding: EdgeInsets.only(left: 2, right: 20),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(40.0),
-                  child: Container(
-                      height: 10,
-                      width: double.infinity,
-                      color: Color(0xFF113311)
-                  ),
-                ),
-              ),
-            )
-          ],
-        ),
+        RatioBar(50, 16),
         SizedBox(
           height: 10,
         ),
         RowItem(
           "loan_circle",
           "Gốc",
-          value: "50.000.000 đ",
+          value: Utils.currencyFormat(50000000),
           hasDivider: false,
           disableTrailing: true,
             padding: EdgeInsets.only(top: 10, left: 20, right: 10)
@@ -226,7 +238,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "interest_circle",
             "Lãi suất",
-            value: "16.479.237 đ",
+            value: Utils.currencyFormat(50000000 * bank.interestPercentage),
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -234,7 +246,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "",
             "Tổng phải trả",
-            value: "66.479.237 đ",
+            value: Utils.currencyFormat(50000000 * (1 + bank.interestPercentage)),
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -242,7 +254,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "",
             "Lãi suất tham khảo",
-            value: "29%",
+            value: "${bank.interestPercentage}%",
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -250,7 +262,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "",
             "Thu nhập tối thiểu",
-            value: "3.000.000 đ",
+            value: Utils.currencyFormat(bank.minIncome),
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -258,7 +270,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "",
             "Kì hạn vay tối đa",
-            value: "3 năm",
+            value: bank.maxLoanTerm,
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -266,7 +278,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         RowItem(
             "",
             "Thời gian duyệt vay",
-            value: "2-3 ngày",
+            value: bank.verifiedIn,
             hasDivider: false,
             disableTrailing: true,
             padding: EdgeInsets.only(top: 5, left: 20, right: 10)
@@ -283,7 +295,12 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 title: "So sánh".toUpperCase(),
                 buttonType: ButtonType.gray_filled,
-                onPressed: () => {},
+                onPressed: () => {
+                  Navigator.pushNamed(context, ScreenRouter.COMPARISION, arguments: {
+                    "banksList" : state.listBanks,
+                    "bank": bank
+                  })
+                },
               ),
             ),
             Expanded(
@@ -292,7 +309,7 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 title: "Tìm hiểu".toUpperCase(),
                 buttonType: ButtonType.white_filled,
-                onPressed: () => Navigator.pushNamed(context, ScreenRouter.LOAN_DETAIL),
+                onPressed: () => Navigator.pushNamed(context, ScreenRouter.LOAN_DETAIL, arguments: bank),
               ),
             )
           ],
@@ -340,15 +357,34 @@ class _PrivateLoanScreenState extends State<PrivateLoanScreen>  {
         ),
         _buildFilter(),
         SizedBox(
-          height: 40,
+          height: 20,
         ),
-        Text("Tìm thấy 3 sản phẩm", textAlign: TextAlign.center),
+        BlocBuilder<PrivateLoanCubit, PrivateLoanState>(
+          builder:(context, state) => state is BankListSuccess ? Column(
+            children: [
+              Text("Tìm thấy ${state.listBanks.length} dữ liệu", textAlign: TextAlign.center),
+              SizedBox(
+                height: 30,
+              ),
+              Container(
+                height: 720,
+                child: Swiper(
+                  outer: false,
+                  itemBuilder: (BuildContext context, int index){
+                    return _buildResultCard(state, state.listBanks[index]);
+                  },
+                  itemCount: state.listBanks.length,
+                  pagination: SwiperPagination(),
+                  control: SwiperControl(),
+                ),
+              )
+            ],
+          ): Text("Không tìm thấy dữ liệu khớp với bộ lọc", textAlign: TextAlign.center)
+        ),
         SizedBox(
-          height: 30,
+          height: 20,
         ),
-        _buildListResult("ocb")
       ],
     );
   }
-
 }

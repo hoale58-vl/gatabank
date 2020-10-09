@@ -4,8 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:gatabank/config.dart';
 import 'package:gatabank/screen_router.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
+import 'package:gatabank/screens/auth/auth_states.dart';
 import 'package:gatabank/screens/home/home_cubit.dart';
 import 'package:gatabank/screens/home/home_states.dart';
+import 'package:gatabank/widgets/app_bar_widget.dart';
+
+import '../../utils.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -52,11 +57,54 @@ class _HomeScreenState extends State<HomeScreen>  {
       child: BlocBuilder<HomeCubit, HomeState>(
         cubit: _homeCubit,
         builder: (context, state) {
-          return Scaffold(
-            body: Container(
-              color: App.theme.colors.background,
-              child: _buildHomeScreen(),
-            ),
+          return BlocListener<AuthCubit, AuthenticationState>(
+            listener: (context, state){
+              if (state is AuthenticationUnauthenticated){
+                Navigator.pushNamedAndRemoveUntil(
+                  context, ScreenRouter.ROOT, (route) => false);
+              }
+            },
+            child: Scaffold(
+              appBar: AppBarWidget(
+                "Trang chủ",
+                actions: [
+                  InkWell(
+                    onTap: () => Utils.showCustomDialog(context,
+                        title: "Nhập lại thông tin",
+                        content: "Bạn có muốn nhập lại thông tin tài khoản",
+                        onSubmit: () {
+                          Navigator.pushNamed(context, ScreenRouter.USER_INFO);
+                        }
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(
+                          Icons.update
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Utils.showCustomDialog(context,
+                        title: "Đăng xuất",
+                        content: "Bạn có muốn đăng xuất tài khoản",
+                        onSubmit: () {
+                          BlocProvider.of<AuthCubit>(context).loggedOut();
+                        }
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: Icon(
+                          Icons.exit_to_app
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              body: Container(
+                color: App.theme.colors.background,
+                child: _buildHomeScreen(),
+              ),
+            )
           );
         },
       ),

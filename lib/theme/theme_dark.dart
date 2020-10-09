@@ -15,6 +15,8 @@ final darkTheme = Themes(
         button1: Color(0x40EBEBF5),
         primary: Color(0xFF3368FF),
         background: Color(0xFF0A0A0A),
+        background1: Color(0xFFFF8400),
+        interest: Color(0xFF113311),
         text1: Color(0xFFFFFFFF),
         text2: Color(0xFFFFFFFF),
         text3: Color(0x29EBEBF5),

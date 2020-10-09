@@ -2,10 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gatabank/config.dart';
+import 'package:gatabank/screens/auth/auth_cubit.dart';
 import 'package:gatabank/screens/loan_detail/loan_detail_cubit.dart';
 import 'package:gatabank/screens/loan_detail/loan_detail_states.dart';
 import 'package:gatabank/widgets/button_widget.dart';
+import 'package:gatabank/widgets/ratio_bar.dart';
 import 'package:gatabank/widgets/row_item.dart';
+
+import '../../screen_router.dart';
+import '../../utils.dart';
 
 
 class LoanDetailScreen extends StatefulWidget {
@@ -68,16 +73,36 @@ class _LoanDetailScreenState extends State<LoanDetailScreen>  {
                     )
                   ),
                   actions: <Widget>[
-                    Padding(
-                        padding: EdgeInsets.only(right: 20.0),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Icon(
-                            Icons.menu,
-                            size: 26.0,
-                          ),
-                        )
+                    InkWell(
+                      onTap: () => Utils.showCustomDialog(context,
+                          title: "Nhập lại thông tin",
+                          content: "Bạn có muốn nhập lại thông tin tài khoản",
+                          onSubmit: () {
+                            Navigator.pushNamed(context, ScreenRouter.USER_INFO);
+                          }
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Icon(
+                            Icons.update
+                        ),
+                      ),
                     ),
+                    InkWell(
+                      onTap: () => Utils.showCustomDialog(context,
+                          title: "Đăng xuất",
+                          content: "Bạn có muốn đăng xuất tài khoản",
+                          onSubmit: () {
+                            BlocProvider.of<AuthCubit>(context).loggedOut();
+                          }
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 10),
+                        child: Icon(
+                            Icons.exit_to_app
+                        ),
+                      ),
+                    )
                   ],
                 )
             ),
@@ -110,38 +135,7 @@ class _LoanDetailScreenState extends State<LoanDetailScreen>  {
               SizedBox(
                 height: 15,
               ),
-              Row(
-                children: [
-                  Expanded(
-                      flex: 50,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 20, right: 2),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(40.0),
-                          child: Container(
-                              height: 10,
-                              width: double.infinity,
-                              color: App.theme.colors.background1
-                          ),
-                        ),
-                      )
-                  ),
-                  Expanded(
-                    flex: 16,
-                    child: Padding(
-                      padding: EdgeInsets.only(left: 2, right: 20),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(40.0),
-                        child: Container(
-                            height: 10,
-                            width: double.infinity,
-                            color: Color(0xFF113311)
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
+              RatioBar(50,16),
               SizedBox(
                 height: 15,
               ),
