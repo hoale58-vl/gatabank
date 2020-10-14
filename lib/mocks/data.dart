@@ -1,5 +1,6 @@
 
 import 'package:gatabank/models/bank.dart';
+import 'package:gatabank/models/card.dart';
 
 class BankMockData {
   static list(){
@@ -438,6 +439,70 @@ class UserMockData{
         "full_name": "Lvhoa",
         "phone": "+84937134373"
       }
+    };
+  }
+}
+
+class CardMockData {
+  static list(){
+    return {
+      "data" : [
+        {
+          Card.ID: "0",
+          Card.NAME: "yolo",
+          Card.IMAGE: "assets/yolo.png",
+          Card.SPONSOR: "VPBank MC2",
+          Card.SUBTITLE: "",
+          Card.RATING: 5.0,
+          Card.CARD_BENEFITS: [
+            {
+              CardBenefit.LABEL: "Tiện ích sử dụng thẻ",
+              CardBenefit.DESCRIPTION : '''Tích điểm đổi quà
+                *1.000 VND = 6 điểm chi tiêu.
+                * Mỗi 1.000 VND khi chi tiêu tại nước ngoài hoặc vào ngày sinh nhật sẽ được tặng thêm 1 điểm 
+                Một số giao dịch không được tích điểm:.
+                Các giao dịch rút tiền mặt, giao dịch có tính phí/ lãi. Trả góp và các giao dịch chi tiêu mua xăng dầu hay thanh toán hóa đơn điện, gas, nước, dầu sưởi; thanh toán dịch vụ hệ thống công nghệ thông tin và dịch vụ viễn thông.
+                
+                Tặng thêm 20% giá trị thẻ nạp vào tài khoản khuyến mãi của Mobifone cho thuê bao trả trước. Áp dụng vào thứ 4 hàng tuần. Không giới hạn số lần  nạp tiền dịch vụ trong ngày hưởng khuyến mãi
+                Giảm cước thanh toán 8% ( tối đa 80.000VND/tháng) cho thuê bao trả sau
+                Note: 2 ưu đãi cước nói trên áp dụng cho chính số điện thoại đăng ký mở thẻ và giao dịch thanh toán được thực hiện qua kênh VPBank Online
+                Riêng với MobiFone Classic: Rút tiền mặt không mất phí
+               '''
+            }
+          ],
+          Card.CARD_FEE: {
+            CardFee.CASH_ADVANCE: "4%",
+            CardFee.LATE_PAYMENT: "5% tối thiểu 249,000đ; tối đa 999,000đ",
+            CardFee.FOREIGN_TRANSACTION: "3%",
+          },
+          Card.CARD_BASIC: {
+            CardBasic.FREE_AIRPORT_LOUNGE: null,
+            CardBasic.AVERAGE_REFUND: null,
+            CardBasic.MAX_REFUND: null,
+            CardBasic.CARD_ORG: "MasterCard",
+            CardBasic.INTEREST: 1.99,
+            CardBasic.YEARLY_FEE: 699000,
+            CardBasic.ISSUE_FEE: 0,
+            CardBasic.INTEREST_FREE_DAY: 45,
+          },
+          Card.CARD_DISCOUNTS:[
+            {
+              CardDiscount.LABEL: "Giảm giá 15% trên tổng hoá đơn TIPSY ART",
+              CardDiscount.DESCRIPTION : "Giảm giá 15% trên tổng hoá đơn TIPSY ART"
+            },
+            {
+              CardDiscount.LABEL: "Tặng ngay combo 1 vé 2D + 1 popcorn (Bắp 32oz) cho KH khi mua 1 vé xem phim và thanh toán bằng thẻ tín dụng VPBank",
+              CardDiscount.DESCRIPTION : "Tặng ngay combo 1 vé 2D + 1 popcorn (Bắp 32oz) cho KH khi mua 1 vé xem phim và thanh toán bằng thẻ tín dụng VPBank"
+            }
+          ],
+          Card.CARD_REQUIREMENT: {
+            CardRequirement.AGE : 21,
+            CardRequirement.PERSONAL_IDENTIFIER: "CMND hoặc hộ chiếu",
+            CardRequirement.INCOME_REQUIREMENT: 3000000,
+            CardRequirement.HOME_IDENTIFIER: "Hộ khẩu/KT3",
+          }
+        },
+      ]
     };
   }
 }

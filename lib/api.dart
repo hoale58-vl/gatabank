@@ -84,13 +84,19 @@ class API  {
     return await _dio.put('/user/$userId', data: json);
   }
 
-  Future<Response> listBanks() {
+  Future<Response> listBanks() async {
+
+  }
+
+  Future<Response> listCards({cardType, discount, order, calTool}) async {
 
   }
 
   void addErrorInterceptor(callback) {
     _onErrorCallbacks.add(callback);
   }
+
+
 }
 
 final api = new API();
